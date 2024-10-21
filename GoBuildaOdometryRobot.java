@@ -4,8 +4,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class GoBuildaOdometryRobot extends LinearOpMode {
 
     // Hardware
-    private DcMotor leftMotor;
-    private DcMotor rightMotor;
+    private DcMotor motorFrontRight;
+    private DcMotor motorFrontLeft;
+    private DcMotor motorBackRight;
+    private DcMotor motorBackLeft;
 
     // Odometry variables
     private double robotX = 0;
@@ -20,12 +22,16 @@ public class GoBuildaOdometryRobot extends LinearOpMode {
     @Override
     public void runOpMode() {
         // Initialize hardware
-        leftMotor = hardwareMap.get(DcMotor.class, "left_motor");
-        rightMotor = hardwareMap.get(DcMotor.class, "right_motor");
+        motorFrontLeft = hardwareMap.get(DcMotor.class, "motorFrontLeft");
+        motorFrontRight = hardwareMap.get(DcMotor.class, "motorFrontRight");
+        motorBackLeft = hardwareMap.get(DcMotor.class, "motorBackLeft");
+        motorBackRight = hardwareMap.get(DcMotor.class, "motorBackRight");
 
         // Reset encoders
-        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
 
@@ -34,12 +40,31 @@ public class GoBuildaOdometryRobot extends LinearOpMode {
             // Update odometry
             updateOdometry();
 
-            // Drive robot based on gamepad input
-            double leftPower = gamepad1.left_stick_y;
-            double rightPower = gamepad1.right_stick_y;
+            // Get joystick inputs for mecanum drive
+            double drive = -gamepad1.left_stick_y; // Forward/reverse
+            double strafe = gamepad1.left_stick_x; // Left/right
+            double rotate = gamepad1.right_stick_x; // Rotation
 
-            leftMotor.setPower(leftPower);
-            rightMotor.setPower(rightPower);
+            // Calculate motor powers
+            double frontLeftPower = drive + strafe + rotate;
+            double frontRightPower = drive - strafe - rotate;
+            double backLeftPower = drive - strafe + rotate;
+            double backRightPower = drive + strafe - rotate;
+
+            // Normalize the powers if any exceeds 1.0
+            double maxPower = Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(frontRightPower), Math.max(Math.abs(backLeftPower), Math.abs(backRightPower))));
+            if (maxPower > 1.0) {
+                frontLeftPower /= maxPower;
+                frontRightPower /= maxPower;
+                backLeftPower /= maxPower;
+                backRightPower /= maxPower;
+            }
+
+            // Set motor powers
+            motorFrontLeft.setPower(frontLeftPower);
+            motorFrontRight.setPower(frontRightPower);
+            motorBackLeft.setPower(backLeftPower);
+            motorBackRight.setPower(backRightPower);
 
             // Display telemetry
             telemetry.addData("X: ", robotX);
@@ -51,8 +76,8 @@ public class GoBuildaOdometryRobot extends LinearOpMode {
 
     private void updateOdometry() {
         // Get current encoder positions
-        int leftPosition = leftMotor.getCurrentPosition();
-        int rightPosition = rightMotor.getCurrentPosition();
+        int leftPosition = motorFrontLeft.getCurrentPosition(); // You can average or use other encoders for better accuracy
+        int rightPosition = motorFrontRight.getCurrentPosition();
 
         // Calculate distance traveled by each wheel
         double leftDistance = leftPosition * WHEEL_CIRCUMFERENCE / ENCODER_TICKS_PER_REV;
