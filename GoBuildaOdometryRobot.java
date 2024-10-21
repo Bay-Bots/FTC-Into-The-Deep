@@ -1,46 +1,36 @@
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.Encoder;
 
-public class OdometryRobot extends LinearOpMode {
+public class GoBuildaOdometryRobot extends LinearOpMode {
 
     // Hardware
     private DcMotor leftMotor;
     private DcMotor rightMotor;
-    private DcMotor deadWheelMotor; // This is the motor for dead wheel tracking
-    private Servo deadWheelServo; // Servo to control drop down mechanism
 
     // Odometry variables
     private double robotX = 0;
     private double robotY = 0;
     private double robotHeading = 0; // In radians
-    private double deadWheelDistance = 0; // Distance measured by the dead wheels
+
+    // Constants for odometry calculations
+    private static final double WHEEL_CIRCUMFERENCE = 0.1; // Example value in meters
+    private static final double ENCODER_TICKS_PER_REV = 1120; // Change according to your encoder
+    private static final double TRACK_WIDTH = 0.3; // Distance between left and right wheels
 
     @Override
     public void runOpMode() {
         // Initialize hardware
         leftMotor = hardwareMap.get(DcMotor.class, "left_motor");
         rightMotor = hardwareMap.get(DcMotor.class, "right_motor");
-        deadWheelMotor = hardwareMap.get(DcMotor.class, "dead_wheel_motor");
-        deadWheelServo = hardwareMap.get(Servo.class, "dead_wheel_servo");
 
         // Reset encoders
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        deadWheelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
 
         // Main loop
         while (opModeIsActive()) {
-            // Control drop-down mechanism
-            if (gamepad1.a) {
-                deadWheelServo.setPosition(1); // Drop down
-            } else if (gamepad1.b) {
-                deadWheelServo.setPosition(0); // Retract
-            }
-
             // Update odometry
             updateOdometry();
 
@@ -60,7 +50,7 @@ public class OdometryRobot extends LinearOpMode {
     }
 
     private void updateOdometry() {
-        // Basic odometry update logic
+        // Get current encoder positions
         int leftPosition = leftMotor.getCurrentPosition();
         int rightPosition = rightMotor.getCurrentPosition();
 
@@ -73,7 +63,7 @@ public class OdometryRobot extends LinearOpMode {
         robotX += deltaDistance * Math.cos(robotHeading);
         robotY += deltaDistance * Math.sin(robotHeading);
 
-        // Update heading (assuming a differential drive)
-        robotHeading += (rightDistance - leftDistance) / TRACK_WIDTH; // TRACK_WIDTH is the distance between wheels
+        // Update heading
+        robotHeading += (rightDistance - leftDistance) / TRACK_WIDTH; // Update heading based on wheel distance
     }
 }
