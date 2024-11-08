@@ -22,23 +22,34 @@ import java.util.Locale;
 import static java.lang.Double.parseDouble;
 
 public class RobotStructure extends OpMode {
+
+
+
+// INITIALIZATIONS ---------
+// Assign names to parts for code
+// Format: {Part Type} {Part Name in code};
+// public / private is optional
+
+    
     DcMotor motorFrontRight; // Control hub 1 = 2
     DcMotor motorFrontLeft;  // Control hub 1 = 1
     DcMotor motorBackRight;  // Control hub 1 = 0
     DcMotor motorBackLeft;   // Control hub 1 = 3
-    //public DcMotor Linear_Slide;
+ // public DcMotor Linear_Slide;
     public TouchSensor limit1;
     public TouchSensor limit2;
     public DcMotor tapeMotor;   //  Expansion 2
     public DcMotor chainMotor;   //  Expansion  1
     public TouchSensor touch;
-//    public DcMotor Bucket1;
+ //   public DcMotor Bucket1;
  //   public DcMotor Bucket2; 
     
-
+// -------------------------
     @Override
+    // All code in here will run whenever a TeleOp is initialized. 
     public void init() {
-        // down = false;
+// Assign names to parts in Driver Hub configuration
+// Format: {Part name in code} = hardwareMap.get({Part Type}.class, "{Name in driver hub}") 
         motorFrontLeft = hardwareMap.get(DcMotor.class, "motorFrontLeft"); 
         motorFrontRight = hardwareMap.get(DcMotor.class, "motorFrontRight"); 
         motorBackLeft = hardwareMap.get(DcMotor.class, "motorBackLeft"); 
@@ -64,6 +75,8 @@ public class RobotStructure extends OpMode {
 
     @Override
    public void loop() {}
+
+    // This code is the structure for the driver control.
     public void initDriver() {
     float gamepad1LeftY = gamepad1.left_stick_y;
     float gamepad1LeftX = gamepad1.left_stick_x;
