@@ -8,7 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 @TeleOp(name = "DriverControl") // Added name for the TeleOp mode
 public class DriverControl extends OpMode {
-    DcMotor motorOne;
+    // We need to change the names of all of these motors and servos. 
+    DcMotor motorOne; 
     Servo servoOne;
     DcMotor motorTwo;
     Servo servoTwo;
