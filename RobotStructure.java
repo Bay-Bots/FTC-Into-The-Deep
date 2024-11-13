@@ -38,7 +38,7 @@ public class RobotStructure extends OpMode {
  // public DcMotor Linear_Slide;
     public TouchSensor limit1;
     public TouchSensor limit2;
-    public DcMotor tapeMotor;   //  Expansion 2
+    public DcMotor tapeMotor;   //  We need to change the tapMotor and chainMotor to liftLeft and liftRight. The lift motors are plugged into expansion slots 1 and 2. 
     public DcMotor chainMotor;   //  Expansion  1
     public TouchSensor touch;
  //   public DcMotor Bucket1;
